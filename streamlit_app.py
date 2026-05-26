@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 import joblib
 import pickle
-from pathcd /workspaces/buatlagi && streamlit run streamlit_app.pylib import Path
+from pathlib import Path
 import traceback
 
 try:
@@ -122,14 +122,14 @@ def try_load_model(path: str):
             return None, tb
 
 @st.cache_data
-def build_shap_explainer(model, background: pd.DataFrame):
-    if shap is None or model is None:
+def build_shap_explainer(_model, background: pd.DataFrame):
+    if shap is None or _model is None:
         return None
     try:
-        return shap.Explainer(model.predict, background)
+        return shap.Explainer(_model.predict, background)
     except Exception:
         try:
-            return shap.KernelExplainer(model.predict, background)
+            return shap.KernelExplainer(_model.predict, background)
         except Exception:
             return None
 
