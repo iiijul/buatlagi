@@ -5,3 +5,5 @@ plotly
 joblib
 python-dotenv
 seaborn
+shap
+Orange3
