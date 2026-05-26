@@ -1,1 +1,7 @@
 streamlit
+pandas
+scikit-learn
+plotly
+joblib
+python-dotenv
+seaborn
