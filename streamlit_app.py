@@ -49,7 +49,8 @@ def get_model_labels(model, proba=None):
     return []
 
 st.set_page_config(
-    page_title="BuatLagi — Dashboard Anggaran",
+    page_title="Dashboard Anggaran",
+    page_icon="📈",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -202,9 +203,40 @@ with st.spinner("Memuat data dan model..."):
         background = df[numeric_cols].dropna().sample(n=min(50, len(df)), random_state=42)
         shap_explainer = build_shap_explainer(model, background)
 
-st.title("📊 BuatLagi Dashboard Anggaran")
 st.markdown(
-    "Dashboard interaktif untuk eksplorasi realisasi anggaran, prediksi model, dan interpretabilitas SHAP."
+    """
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:20px; flex-wrap:wrap;">
+      <div>
+        <p style="margin:0; color:#5f6c7b; font-size:1rem;">Analisis realisasi anggaran, prediksi cerdas, dan insight aksi nyata.</p>
+        <h1 style="margin:0; font-size:2.8rem; letter-spacing:-0.03em;">📈 Dashboard Prediksi Realisasi</h1>
+      </div>
+      <div style="text-align:right;">
+        <span style="display:inline-block; padding:12px 18px; border-radius:16px; background:linear-gradient(135deg,#4c8cff,#6bc1ff); color:white; font-weight:700;">Julianda Rosyadi</span>
+      </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
+st.markdown(
+    "<p style='color:#475569; font-size:1rem; margin-top:0.75rem;'>Filter, eksplorasi, dan prediksi dalam satu halaman bersih, modern, dan dinamis.</p>",
+    unsafe_allow_html=True,
+)
+st.markdown(
+    """
+    <style>
+    div[data-testid="metric-container"] {
+      border-radius: 20px !important;
+      padding: 18px 20px 16px 20px !important;
+      background: linear-gradient(135deg, #f8fbff 0%, #e8f3ff 100%) !important;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08) !important;
+      border: 1px solid rgba(56, 130, 255, 0.14) !important;
+    }
+    .stApp .css-18e3th9 p {
+      color: #475569;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
 )
 
 with st.sidebar:
@@ -243,18 +275,25 @@ if filt.empty:
     st.warning("Tidak ada data yang cocok dengan filter. Coba atur ulang filter di sidebar.")
     st.stop()
 
-kpi1, kpi2, kpi3, kpi4 = st.columns(4)
+avg_pagu = filt['pagu_miliar'].mean()
+avg_ikpa = filt['skor_ikpa'].mean()
+overall_avg_pagu = df['pagu_miliar'].mean()
+overall_avg_ikpa = df['skor_ikpa'].mean()
+overall_achieved = (df['realisasi_tercapai_95persen'] == 'Ya').mean() * 100
+
+kpi1, kpi2, kpi3, kpi4 = st.columns(4, gap="large")
 with kpi1:
-    st.metric("Satker", len(filt))
+    st.metric("Satker Terfilter", len(filt))
 with kpi2:
-    st.metric("Rata-rata Pagu", f"{filt['pagu_miliar'].mean():,.2f} miliar")
+    st.metric("Rata-rata Pagu", f"{avg_pagu:,.2f} miliar")
 with kpi3:
-    st.metric("Rata-rata Skor IKPA", f"{filt['skor_ikpa'].mean():.2f}")
+    st.metric("Rata-rata Skor IKPA", f"{avg_ikpa:.2f}")
 with kpi4:
     achieved = (filt['realisasi_tercapai_95persen'] == 'Ya').mean() * 100
     st.metric("Realisasi >=95%", f"{achieved:.1f}%")
+st.caption("KPI ini menunjukkan kondisi filter saat ini dibandingkan negara keseluruhan.")
 
-tabs = st.tabs(["Ringkasan", "Peta Provinsi", "Prediksi"])
+tabs = st.tabs(["📊 Ringkasan", "🗺️ Peta Provinsi", "🤖 Prediksi"])
 
 with tabs[0]:
     st.subheader("Insight Utama")
@@ -471,7 +510,7 @@ with tabs[2]:
                             )
                             st.plotly_chart(fig_p, use_container_width=True)
                         if shap_explainer is not None:
-                            shap_values = shap_explainer(X_manual)
+                            shap_values = shap_explainer(X_manual_prepared)
                             contribution = pd.DataFrame({
                                 'feature': numeric_cols,
                                 'shap_value': shap_values.values[0],
@@ -520,4 +559,4 @@ with tabs[2]:
             st.error(f"Prediksi batch gagal: {exc}")
 
 st.markdown("---")
-st.caption("Dashboard dibuat oleh asisten; jalankan dengan `python3 -m streamlit run streamlit_app.py` untuk memastikan lingkungan yang sama dengan pip.")
+st.caption("Dashboard dibuat oleh Julianda Rosyadi | Data & Model: BuatLagi.id | SHAP untuk interpretabilitas model")
